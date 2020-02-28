@@ -41,6 +41,8 @@ class OpenCVConan(ConanFile):
                "openblas": [True, False],
                "ffmpeg": [True, False],
                "lapack": [True, False],
+               "python2": [True, False],
+               "python3": [True, False],
                "quirc": [True, False]}
     default_options = {"shared": False,
                        "fPIC": True,
@@ -67,6 +69,8 @@ class OpenCVConan(ConanFile):
                        "openblas": False,
                        "ffmpeg": False,
                        "lapack": False,
+                       "python2": False,
+                       "python3": False,
                        "quirc": True}
     exports_sources = ["CMakeLists.txt", "patches/*.patch"]
     exports = "LICENSE"
@@ -224,14 +228,17 @@ class OpenCVConan(ConanFile):
             cmake.definitions['WITH_IMGCODEC_PXM'] = False
             cmake.definitions['WITH_IMGCODEC_SUNRASTER'] = False
 
+        # python
+        cmake.definitions['BUILD_opencv_python_bindings_generator'] = self.options.python3 or self.options.python2
+        cmake.definitions['BUILD_opencv_python3'] = self.options.python3
+        cmake.definitions['BUILD_opencv_python2'] = self.options.python2
+        cmake.definitions['BUILD_opencv_python_tests'] = False
+        cmake.definitions['PYTHON3_CVPY_SUFFIX'] = '.so'
+
         # We are building C++ only. Disable other languages
         cmake.definitions['BUILD_JAVA'] = False
         cmake.definitions['BUILD_opencv_java_bindings_generator'] = False
         cmake.definitions['BUILD_opencv_js'] = False
-        cmake.definitions['BUILD_opencv_python2'] = False
-        cmake.definitions['BUILD_opencv_python3'] = False
-        cmake.definitions['BUILD_opencv_python_bindings_generator'] = False
-        cmake.definitions['BUILD_opencv_python_tests'] = False
 
         # Don't build tests
         cmake.definitions['BUILD_TESTS'] = False
